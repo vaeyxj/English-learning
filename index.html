@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语短语学习 - English Phrases</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .category-select {
+            margin-bottom: 20px;
+        }
+
+        .category-select label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .category-select select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .category-select select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .phrase-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .phrase-english {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .phrase-chinese {
+            font-size: 1.2rem;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .phrase-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .progress-bar {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .quiz-container {
+            text-align: center;
+        }
+
+        .quiz-question {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-option {
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .quiz-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .quiz-option.correct {
+            background: #c6f6d5;
+            border-color: #48bb78;
+        }
+
+        .quiz-option.wrong {
+            background: #fed7d7;
+            border-color: #f56565;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .phrases-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .phrase-item {
+            background: #f7fafc;
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .phrase-item:hover {
+            background: #edf2f7;
+            transform: translateX(5px);
+        }
+
+        .phrase-item.learned {
+            background: #c6f6d5;
+        }
+
+        .phrase-item-content {
+            flex: 1;
+        }
+
+        .phrase-item-en {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+
+        .phrase-item-cn {
+            color: #718096;
+            font-size: 0.95rem;
+            margin-top: 3px;
+        }
+
+        .phrase-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .icon-btn.speak {
+            color: #667eea;
+        }
+
+        .icon-btn.check {
+            color: #48bb78;
+        }
+
+        .icon-btn.checked {
+            background: #48bb78;
+            color: white;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .phrase-english {
+                font-size: 1.4rem;
+            }
+            
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 英语短语学习</h1>
+            <p>每天学一点，英语进步看得见</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('learn')">📚 学习模式</button>
+            <button class="nav-tab" onclick="showSection('quiz')">📝 测试模式</button>
+            <button class="nav-tab" onclick="showSection('list')">📋 短语列表</button>
+            <button class="nav-tab" onclick="showSection('stats')">📊 学习统计</button>
+        </nav>
+
+        <!-- 学习模式 -->
+        <div id="learn-section" class="card">
+            <div class="category-select">
+                <label>选择学习类别：</label>
+                <select id="category-select" onchange="loadCategory()">
+                    <option value="daily">🌅 日常用语</option>
+                    <option value="business">💼 商务英语</option>
+                    <option value="travel">✈️ 旅行用语</option>
+                    <option value="social">👥 社交互动</option>
+                    <option value="emergency">🆘 紧急情况</option>
+                </select>
+            </div>
+
+            <div id="phrase-display" class="phrase-card">
+                <div class="phrase-english" id="current-phrase">Hello, how are you?</div>
+                <div class="phrase-chinese" id="current-translation">你好，你好吗？</div>
+                <div class="phrase-actions">
+                    <button class="btn btn-primary" onclick="speakPhrase()">
+                        🔊 朗读
+                    </button>
+                    <button class="btn btn-secondary" onclick="markLearned()">
+                        ✅ 已学会
+                    </button>
+                    <button class="btn btn-outline" onclick="nextPhrase()">
+                        下一个 ➡️
+                    </button>
+                </div>
+            </div>
+
+            <div style="text-align: center; color: #718096;">
+                <span id="current-index">1</span> / <span id="total-count">20</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 5%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试模式 -->
+        <div id="quiz-section" class="card hidden">
+            <h2 class="section-title">📝 测试你的学习成果</h2>
+            <div id="quiz-container" class="quiz-container">
+                <div class="quiz-question" id="quiz-question">
+                    点击"开始测试"来检验你的学习成果
+                </div>
+                <div class="quiz-options" id="quiz-options"></div>
+                <button class="btn btn-primary" id="quiz-start-btn" onclick="startQuiz()" style="font-size: 1.2rem; padding: 15px 40px;">
+                    开始测试
+                </button>
+            </div>
+        </div>
+
+        <!-- 短语列表 -->
+        <div id="list-section" class="card hidden">
+            <h2 class="section-title">📋 全部短语</h2>
+            <div class="category-select">
+                <select id="list-category-select" onchange="loadPhraseList()">
+                    <option value="all">全部类别</option>
+                    <option value="daily">🌅 日常用语</option>
+                    <option value="business">💼 商务英语</option>
+                    <option value="travel">✈️ 旅行用语</option>
+                    <option value="social">👥 社交互动</option>
+                    <option value="emergency">🆘 紧急情况</option>
+                </select>
+            </div>
+            <div id="phrases-list" class="phrases-list"></div>
+        </div>
+
+        <!-- 学习统计 -->
+        <div id="stats-section" class="card hidden">
+            <h2 class="section-title">📊 学习统计</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-total">0</div>
+                    <div class="stat-label">总短语数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-learned">0</div>
+                    <div class="stat-label">已学会</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-progress">0%</div>
+                    <div class="stat-label">学习进度</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-quiz">0</div>
+                    <div class="stat-label">测试次数</div>
+                </div>
+            </div>
+            <div class="progress-bar" style="height: 20px; margin-top: 20px;">
+                <div class="progress-fill" id="stats-progress-fill" style="width: 0%"></div>
+            </div>
+            <p style="text-align: center; margin-top: 10px; color: #718096;">
+                你已经完成了 <span id="stats-percent">0%</span> 的学习目标！
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 短语数据库
+        const phrases = {
+            daily: [
+                { en: "Hello, how are you?", cn: "你好，你好吗？" },
+                { en: "Nice to meet you.", cn: "很高兴认识你。" },
+                { en: "Thank you very much.", cn: "非常感谢。" },
+                { en: "You're welcome.", cn: "不客气。" },
+                { en: "Excuse me.", cn: "打扰一下 / 借过。" },
+                { en: "I'm sorry.", cn: "对不起。" },
+                { en: "No problem.", cn: "没问题。" },
+                { en: "Have a good day!", cn: "祝你今天愉快！" },
+                { en: "See you later.", cn: "回头见。" },
+                { en: "Good morning!", cn: "早上好！" },
+                { en: "Good night!", cn: "晚安！" },
+                { en: "How's it going?", cn: "最近怎么样？" },
+                { en: "Long time no see.", cn: "好久不见。" },
+                { en: "Take care.", cn: "保重。" },
+                { en: "I don't understand.", cn: "我不明白。" },
+                { en: "Could you repeat that?", cn: "你能再说一遍吗？" },
+                { en: "What do you think?", cn: "你怎么看？" },
+                { en: "That sounds great!", cn: "听起来很棒！" },
+                { en: "I'm not sure.", cn: "我不确定。" },
+                { en: "Let me think about it.", cn: "让我想想。" }
+            ],
+            business: [
+                { en: "Let's schedule a meeting.", cn: "我们安排个会议吧。" },
+                { en: "I'll get back to you soon.", cn: "我很快回复你。" },
+                { en: "Can we discuss this?", cn: "我们能讨论一下这个吗？" },
+                { en: "What's the deadline?", cn: "截止日期是什么时候？" },
+                { en: "I'll handle it.", cn: "我来处理。" },
+                { en: "Let's touch base next week.", cn: "我们下周联系一下。" },
+                { en: "I'm tied up right now.", cn: "我现在很忙。" },
+                { en: "Could you clarify that?", cn: "你能解释一下吗？" },
+                { en: "Let's move forward with this.", cn: "我们继续推进这个吧。" },
+                { en: "I need your input on this.", cn: "我需要你在这个上的意见。" },
+                { en: "The bottom line is...", cn: "底线是..." },
+                { en: "Let's think outside the box.", cn: "我们要跳出思维定式。" },
+                { en: "Can you give me a ballpark figure?", cn: "能给我一个大概数字吗？" },
+                { en: "We need to streamline this process.", cn: "我们需要简化这个流程。" },
+                { en: "Let's circle back to this.", cn: "我们稍后再回到这个话题。" }
+            ],
+            travel: [
+                { en: "Where is the bathroom?", cn: "洗手间在哪里？" },
+                { en: "How much does this cost?", cn: "这个多少钱？" },
+                { en: "I'd like to check in.", cn: "我想办理入住。" },
+                { en: "Can I get the menu, please?", cn: "能给我菜单吗？" },
+                { en: "Is there Wi-Fi here?", cn: "这里有Wi-Fi吗？" },
+                { en: "What time does it open?", cn: "几点开门？" },
+                { en: "I'd like a table for two.", cn: "我想要一张两人桌。" },
+                { en: "Can you recommend a good restaurant?", cn: "你能推荐一家好餐厅吗？" },
+                { en: "How do I get to...?", cn: "我怎么去...？" },
+                { en: "I'd like to book a room.", cn: "我想预订一个房间。" },
+                { en: "Is breakfast included?", cn: "包含早餐吗？" },
+                { en: "Can I have the bill, please?", cn: "能给我账单吗？" },
+                { en: "Do you accept credit cards?", cn: "你们收信用卡吗？" },
+                { en: "I'm looking for...", cn: "我在找..." },
+                { en: "It's too expensive.", cn: "太贵了。" }
+            ],
+            social: [
+                { en: "What do you do for fun?", cn: "你平时喜欢做什么？" },
+                { en: "Tell me about yourself.", cn: "跟我说说你自己。" },
+                { en: "We should hang out sometime.", cn: "我们应该找个时间出去玩。" },
+                { en: "I'm having a party this weekend.", cn: "我这周末有个派对。" },
+                { en: "Do you want to grab coffee?", cn: "你想去喝杯咖啡吗？" },
+                { en: "What's new with you?", cn: "你最近怎么样？" },
+                { en: "Keep in touch!", cn: "保持联系！" },
+                { en: "I'm just kidding.", cn: "我开玩笑的。" },
+                { en: "You crack me up!", cn: "你太逗了！" },
+                { en: "That's hilarious!", cn: "太好笑了！" },
+                { en: "I'm down for whatever.", cn: "我什么都行。" },
+                { en: "Let's split the bill.", cn: "我们AA吧。" },
+                { en: "It's my treat.", cn: "我请客。" },
+                { en: "Cheers!", cn: "干杯！" },
+                { en: "Bottoms up!", cn: "一饮而尽！" }
+            ],
+            emergency: [
+                { en: "Help!", cn: "救命！" },
+                { en: "Call the police!", cn: "报警！" },
+                { en: "I need a doctor.", cn: "我需要医生。" },
+                { en: "Where is the hospital?", cn: "医院在哪里？" },
+                { en: "I've lost my passport.", cn: "我的护照丢了。" },
+                { en: "I'm allergic to...", cn: "我对...过敏。" },
+                { en: "It's an emergency!", cn: "这是紧急情况！" },
+                { en: "Can you help me?", cn: "你能帮我吗？" },
+                { en: "I don't feel well.", cn: "我不舒服。" },
+                { en: "Where is the nearest pharmacy?", cn: "最近的药店在哪里？" },
+                { en: "My phone was stolen.", cn: "我的手机被偷了。" },
+                { en: "I need to contact my embassy.", cn: "我需要联系我的大使馆。" },
+                { en: "I've been in an accident.", cn: "我出事故了。" },
+                { en: "Is there a doctor here?", cn: "这里有医生吗？" },
+                { en: "Please hurry!", cn: "请快点！" }
+            ]
+        };
+
+        // 状态管理
+        let currentCategory = 'daily';
+        let currentIndex = 0;
+        let learnedPhrases = JSON.parse(localStorage.getItem('learnedPhrases') || '[]');
+        let quizStats = JSON.parse(localStorage.getItem('quizStats') || '{"total": 0, "correct": 0}');
+
+        // 初始化
+        function init() {
+            loadCategory();
+            loadPhraseList();
+            updateStats();
+        }
+
+        // 切换标签页
+        function showSection(section) {
+            // 隐藏所有部分
+            document.getElementById('learn-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.add('hidden');
+            document.getElementById('list-section').classList.add('hidden');
+            document.getElementById('stats-section').classList.add('hidden');
+            
+            // 移除所有active类
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            // 显示选中的部分
+            document.getElementById(section + '-section').classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if (section === 'list') {
+                loadPhraseList();
+            } else if (section === 'stats') {
+                updateStats();
+            }
+        }
+
+        // 加载类别
+        function loadCategory() {
+            currentCategory = document.getElementById('category-select').value;
+            currentIndex = 0;
+            displayPhrase();
+        }
+
+        // 显示当前短语
+        function displayPhrase() {
+            const category = phrases[currentCategory];
+            const phrase = category[currentIndex];
+            
+            document.getElementById('current-phrase').textContent = phrase.en;
+            document.getElementById('current-translation').textContent = phrase.cn;
+            document.getElementById('current-index').textContent = currentIndex + 1;
+            document.getElementById('total-count').textContent = category.length;
+            document.getElementById('progress-fill').style.width = 
+                ((currentIndex + 1) / category.length * 100) + '%';
+        }
+
+        // 朗读短语
+        function speakPhrase() {
+            const phrase = document.getElementById('current-phrase').textContent;
+            const utterance = new SpeechSynthesisUtterance(phrase);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
+            speechSynthesis.speak(utterance);
+        }
+
+        // 朗读指定文本
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
+            speechSynthesis.speak(utterance);
+        }
+
+        // 标记已学会
+        function markLearned() {
+            const phrase = phrases[currentCategory][currentIndex];
+            const phraseId = currentCategory + '-' + currentIndex;
+            
+            if (!learnedPhrases.includes(phraseId)) {
+                learnedPhrases.push(phraseId);
+                localStorage.setItem('learnedPhrases', JSON.stringify(learnedPhrases));
+            }
+            
+            // 自动下一个
+            nextPhrase();
+        }
+
+        // 下一个短语
+        function nextPhrase() {
+            const category = phrases[currentCategory];
+            currentIndex = (currentIndex + 1) % category.length;
+            displayPhrase();
+        }
+
+        // 加载短语列表
+        function loadPhraseList() {
+            const listCategory = document.getElementById('list-category-select').value;
+            const container = document.getElementById('phrases-list');
+            container.innerHTML = '';
+            
+            const categories = listCategory === 'all' ? Object.keys(phrases) : [listCategory];
+            
+            categories.forEach(cat => {
+                phrases[cat].forEach((phrase, idx) => {
+                    const phraseId = cat + '-' + idx;
+                    const isLearned = learnedPhrases.includes(phraseId);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'phrase-item' + (isLearned ? ' learned' : '');
+                    item.innerHTML = `
+                        <div class="phrase-item-content">
+                            <div class="phrase-item-en">${phrase.en}</div>
+                            <div class="phrase-item-cn">${phrase.cn}</div>
+                        </div>
+                        <div class="phrase-item-actions">
+                            <button class="icon-btn speak" onclick="speak('${phrase.en.replace(/'/g, "\\'")}')">🔊</button>
+                            <button class="icon-btn check ${isLearned ? 'checked' : ''}" onclick="toggleLearned('${phraseId}', this)">${isLearned ? '✓' : '○'}</button>
+                        </div>
+                    `;
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        // 切换学习状态
+        function toggleLearned(phraseId, btn) {
+            if (learnedPhrases.includes(phraseId)) {
+                learnedPhrases = learnedPhrases.filter(id => id !== phraseId);
+                btn.classList.remove('checked');
+                btn.textContent = '○';
+            } else {
+                learnedPhrases.push(phraseId);
+                btn.classList.add('checked');
+                btn.textContent = '✓';
+            }
+            localStorage.setItem('learnedPhrases', JSON.stringify(learnedPhrases));
+            loadPhraseList();
+        }
+
+        // 更新统计
+        function updateStats() {
+            let totalPhrases = 0;
+            Object.values(phrases).forEach(cat => totalPhrases += cat.length);
+            
+            document.getElementById('stat-total').textContent = totalPhrases;
+            document.getElementById('stat-learned').textContent = learnedPhrases.length;
+            document.getElementById('stat-quiz').textContent = quizStats.total;
+            
+            const progress = Math.round(learnedPhrases.length / totalPhrases * 100);
+            document.getElementById('stat-progress').textContent = progress + '%';
+            document.getElementById('stats-progress-fill').style.width = progress + '%';
+            document.getElementById('stats-percent').textContent = progress + '%';
+        }
+
+        // 测试模式
+        let currentQuiz = null;
+
+        function startQuiz() {
+            // 获取所有短语
+            let allPhrases = [];
+            Object.keys(phrases).forEach(cat => {
+                phrases[cat].forEach((p, i) => {
+                    allPhrases.push({...p, id: cat + '-' + i});
+                });
+            });
+            
+            // 随机选择10个
+            allPhrases = allPhrases.sort(() => 0.5 - Math.random()).slice(0, 10);
+            
+            currentQuiz = {
+                phrases: allPhrases,
+                current: 0,
+                correct: 0
+            };
+            
+            document.getElementById('quiz-start-btn').classList.add('hidden');
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            if (currentQuiz.current >= currentQuiz.phrases.length) {
+                // 测试结束
+                const accuracy = Math.round(currentQuiz.correct / currentQuiz.phrases.length * 100);
+                document.getElementById('quiz-question').innerHTML = `
+                    <div style="font-size: 2rem; margin-bottom: 10px;">🎉</div>
+                    测试完成！<br>
+                    正确率：${currentQuiz.correct}/${currentQuiz.phrases.length} (${accuracy}%)
+                `;
+                document.getElementById('quiz-options').innerHTML = '';
+                document.getElementById('quiz-start-btn').textContent = '再测一次';
+                document.getElementById('quiz-start-btn').classList.remove('hidden');
+                
+                // 更新统计
+                quizStats.total++;
+                localStorage.setItem('quizStats', JSON.stringify(quizStats));
+                return;
+            }
+            
+            const phrase = currentQuiz.phrases[currentQuiz.current];
+            document.getElementById('quiz-question').innerHTML = `
+                <div style="font-size: 0.9rem; color: #718096; margin-bottom: 10px;">
+                    问题 ${currentQuiz.current + 1} / ${currentQuiz.phrases.length}
+                </div>
+                "${phrase.cn}"
+            `;
+            
+            // 生成选项（正确答案 + 3个随机错误答案）
+            const options = [phrase];
+            let allOtherPhrases = [];
+            Object.keys(phrases).forEach(cat => {
+                phrases[cat].forEach(p => {
+                    if (p.en !== phrase.en) allOtherPhrases.push(p);
+                });
+            });
+            allOtherPhrases = allOtherPhrases.sort(() => 0.5 - Math.random()).slice(0, 3);
+            options.push(...allOtherPhrases);
+            options.sort(() => 0.5 - Math.random());
+            
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option';
+                btn.textContent = opt.en;
+                btn.onclick = () => checkAnswer(opt, phrase, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, correct, btn) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            
+            if (selected.en === correct.en) {
+                btn.classList.add('correct');
+                currentQuiz.correct++;
+            } else {
+                btn.classList.add('wrong');
+                options.forEach(opt => {
+                    if (opt.textContent === correct.en) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+            
+            setTimeout(() => {
+                currentQuiz.current++;
+                showQuizQuestion();
+            }, 1500);
+        }
+
+        // 初始化
+        init();
+    </script>
+</body>
+</html>

@@ -1,4 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语学习 - Daily English</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 30px; }
+        header h1 { font-size: 2.5rem; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        header p { font-size: 1.1rem; opacity: 0.9; }
+        .nav-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-tab { padding: 12px 24px; background: rgba(255,255,255,0.2); border: none; border-radius: 25px; color: white; cursor: pointer; transition: all 0.3s; }
+        .nav-tab:hover { background: rgba(255,255,255,0.3); transform: translateY(-2px); }
+        .nav-tab.active { background: white; color: #667eea; }
+        .card { background: white; border-radius: 20px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .hidden { display: none !important; }
+        .today-header { text-align: center; margin-bottom: 30px; }
+        .today-date { font-size: 1.2rem; color: #718096; margin-bottom: 10px; }
+        .today-badge { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; margin-bottom: 20px; }
+        .today-content { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 20px; padding: 30px; margin-bottom: 30px; }
+        .today-phrase { font-size: 2rem; font-weight: 700; color: #2d3748; margin-bottom: 10px; text-align: center; }
+        .today-phonetic { font-size: 1.1rem; color: #718096; text-align: center; margin-bottom: 20px; font-family: monospace; }
+        .today-translation { font-size: 1.3rem; color: #4a5568; text-align: center; margin-bottom: 30px; padding: 15px; background: rgba(255,255,255,0.7); border-radius: 10px; }
+        .today-section { margin-bottom: 25px; }
+        .today-section-title { font-size: 1rem; font-weight: 600; color: #667eea; margin-bottom: 10px; }
+        .today-section-content { color: #4a5568; line-height: 1.8; padding-left: 10px; }
+        .today-example { background: white; padding: 15px; border-radius: 10px; margin: 10px 0; border-left: 4px solid #667eea; }
+        .today-example-en { font-weight: 600; color: #2d3748; margin-bottom: 5px; }
+        .today-example-cn { color: #718096; }
+        .start-learning-btn { display: block; width: 100%; max-width: 300px; margin: 30px auto 0; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 30px; font-size: 1.1rem; cursor: pointer; }
+        .start-learning-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-nav-btn { padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .calendar-nav-btn:hover { background: #5a67d8; }
+        .calendar-month { font-size: 1.3rem; font-weight: 600; color: #2d3748; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .calendar-weekday { text-align: center; font-weight: 600; color: #718096; padding: 10px; font-size: 0.9rem; }
+        .calendar-day { aspect-ratio: 1; border: 2px solid #e2e8f0; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; background: white; }
+        .calendar-day:hover { border-color: #667eea; transform: translateY(-2px); }
+        .calendar-day.other-month { opacity: 0.3; }
+        .calendar-day.today { border-color: #667eea; background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%); }
+        .calendar-day.has-content { border-color: #48bb78; background: #f0fff4; }
+        .calendar-day-number { font-size: 1.1rem; font-weight: 600; color: #2d3748; }
+        .calendar-day.today .calendar-day-number { color: #667eea; }
+        .calendar-day.has-content .calendar-day-number { color: #48bb78; }
+        .calendar-day-indicator { width: 6px; height: 6px; background: #48bb78; border-radius: 50%; margin-top: 4px; }
+        .history-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .history-modal.active { display: flex; }
+        .history-content { background: white; border-radius: 20px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; padding: 30px; position: relative; }
+        .history-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #718096; }
+        .history-close:hover { color: #2d3748; }
+        .history-date { font-size: 1.1rem; color: #718096; margin-bottom: 15px; }
+        .category-select { margin-bottom: 20px; }
+        .category-select label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .category-select select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; cursor: pointer; }
+        .category-select select:focus { outline: none; border-color: #667eea; }
+        .phrase-card { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; padding: 25px; margin-bottom: 20px; }
+        .phrase-english { font-size: 1.8rem; font-weight: 700; color: #2d3748; margin-bottom: 10px; }
+        .phrase-chinese { font-size: 1.2rem; color: #4a5568; margin-bottom: 15px; }
+        .phrase-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.95rem; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; transform: translateY(-2px); }
+        .btn-secondary { background: #48bb78; color: white; }
+        .btn-secondary:hover { background: #38a169; }
+        .btn-outline { background: transparent; border: 2px solid #667eea; color: #667eea; }
+        .btn-outline:hover { background: #667eea; color: white; }
+        .progress-bar { background: #e2e8f0; border-radius: 10px; height: 10px; margin-top: 10px; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, #667eea, #764ba2); height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+        .quiz-container { text-align: center; }
+        .quiz-question { font-size: 1.5rem; color: #2d3748; margin-bottom: 30px; padding: 30px; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border-radius: 15px; }
+        .quiz-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .quiz-option { padding: 20px; background: white; border: 2px solid #e0e0e0; border-radius: 10px; cursor: pointer; transition: all 0.3s; font-size: 1.1rem; }
+        .quiz-option:hover { border-color: #667eea; transform: translateY(-2px); }
+        .quiz-option.correct { background: #c6f6d5; border-color: #48bb78; }
+        .quiz-option.wrong { background: #fed7d7; border-color: #f56565; }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-item { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 15px; text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: 700; }
+        .stat-label { font-size: 0.9rem; opacity: 0.9; }
+        .phrases-list { display: grid; gap: 15px; }
+        .phrase-item { background: #f7fafc; padding: 15px 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.3s; }
+        .phrase-item:hover { background: #edf2f7; transform: translateX(5px); }
+        .phrase-item.learned { background: #c6f6d5; }
+        .phrase-item-en { font-weight: 600; color: #2d3748; font-size: 1.1rem; }
+        .phrase-item-cn { color: #718096; font-size: 0.95rem; margin-top: 3px; }
+        .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .icon-btn:hover { transform: scale(1.1); }
+        .icon-btn.speak { color: #667eea; }
+        .icon-btn.check { color: #48bb78; }
+        .icon-btn.checked { background: #48bb78; color: white; }
+        .section-title { font-size: 1.5rem; color: #2d3748; margin-bottom: 20px; }
+        .empty-state { text-align: center; padding: 50px; color: #718096; }
+        @media (max-width: 768px) { header h1 { font-size: 1.8rem; } .today-phrase { font-size: 1.5rem; } .calendar-grid { gap: 5px; } .phrase-english { font-size: 1.4rem; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 英语学习</h1>
+            <p>每天学一点，英语进步看得见</p>
+        </header>
 
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('today')">📅 今日推送</button>
+            <button class="nav-tab" onclick="showSection('calendar')">🗓️ 学习日历</button>
+            <button class="nav-tab" onclick="showSection('learn')">📚 短语学习</button>
+            <button class="nav-tab" onclick="showSection('quiz')">📝 测试模式</button>
+            <button class="nav-tab" onclick="showSection('list')">📋 短语列表</button>
+            <button class="nav-tab" onclick="showSection('stats')">📊 学习统计</button>
+        </nav>
+
+        <!-- 今日推送 -->
+        <div id="today-section" class="card">
+            <div class="today-header">
+                <div class="today-date" id="today-date"></div>
+                <div class="today-badge">🌟 今日推荐</div>
+            </div>
+            <div class="today-content" id="today-content"></div>
+            <button class="start-learning-btn" onclick="showSection('learn')">🚀 开始学习更多短语</button>
+        </div>
+
+        <!-- 学习日历 -->
+        <div id="calendar-section" class="card hidden">
+            <h2 class="section-title">🗓️ 学习日历</h2>
+            <div class="calendar-header">
+                <button class="calendar-nav-btn" onclick="changeMonth(-1)">◀ 上月</button>
+                <div class="calendar-month" id="calendar-month"></div>
+                <button class="calendar-nav-btn" onclick="changeMonth(1)">下月 ▶</button>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+            <div style="margin-top: 20px; text-align: center; color: #718096;">
+                <span style="margin-right: 20px;"><span style="width: 12px; height: 12px; background: #48bb78; border-radius: 50%; display: inline-block;"></span> 有学习内容</span>
+                <span><span style="width: 12px; height: 12px; background: #667eea; border-radius: 50%; display: inline-block;"></span> 今天</span>
+            </div>
+        </div>
+
+        <!-- 历史弹窗 -->
+        <div class="history-modal" id="history-modal" onclick="closeHistory(event)">
+            <div class="history-content" onclick="event.stopPropagation()">
+                <span class="history-close" onclick="closeHistory()">×</span>
+                <div class="history-date" id="history-date"></div>
+                <div id="history-body"></div>
+            </div>
+        </div>
+
+        <!-- 学习模式 -->
+        <div id="learn-section" class="card hidden">
+            <div class="category-select">
+                <label>选择学习类别：</label>
+                <select id="category-select" onchange="loadCategory()">
+                    <option value="daily">🌅 日常用语</option>
+                    <option value="business">💼 商务英语</option>
+                    <option value="travel">✈️ 旅行用语</option>
+                    <option value="social">👥 社交互动</option>
+                    <option value="emergency">🆘 紧急情况</option>
+                </select>
+            </div>
+            <div id="phrase-display" class="phrase-card">
+                <div class="phrase-english" id="current-phrase">Hello, how are you?</div>
+                <div class="phrase-chinese" id="current-translation">你好，你好吗？</div>
+                <div class="phrase-actions">
+                    <button class="btn btn-primary" onclick="speakPhrase()">🔊 朗读</button>
+                    <button class="btn btn-secondary" onclick="markLearned()">✅ 已学会</button>
+                    <button class="btn btn-outline" onclick="nextPhrase()">下一个 ➡️</button>
+                </div>
+            </div>
+            <div style="text-align: center; color: #718096;">
+                <span id="current-index">1</span> / <span id="total-count">20</span>
+                <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width: 5%"></div></div>
+            </div>
+        </div>
+
+        <!-- 测试模式 -->
+        <div id="quiz-section" class="card hidden">
+            <h2 class="section-title">📝 测试你的学习成果</h2>
+            <div id="quiz-container" class="quiz-container">
+                <div class="quiz-question" id="quiz-question">点击"开始测试"来检验你的学习成果</div>
+                <div class="quiz-options" id="quiz-options"></div>
+                <button class="btn btn-primary" id="quiz-start-btn" onclick="startQuiz()" style="font-size: 1.2rem; padding: 15px 40px;">开始测试</button>
+            </div>
+        </div>
+
+        <!-- 短语列表 -->
+        <div id="list-section" class="card hidden">
+            <h2 class="section-title">📋 全部短语</h2>
+            <div class="category-select">
+                <select id="list-category-select" onchange="loadPhraseList()">
+                    <option value="all">全部类别</option>
+                    <option value="daily">🌅 日常用语</option>
+                    <option value="business">💼 商务英语</option>
+                    <option value="travel">✈️ 旅行用语</option>
+                    <option value="social">👥 社交互动</option>
+                    <option value="emergency">🆘 紧急情况</option>
+                </select>
+            </div>
+            <div id="phrases-list" class="phrases-list"></div>
+        </div>
+
+        <!-- 学习统计 -->
+        <div id="stats-section" class="card hidden">
+            <h2 class="section-title">📊 学习统计</h2>
+            <div class="stats">
+                <div class="stat-item"><div class="stat-number" id="stat-total">0</div><div class="stat-label">总短语数</div></div>
+                <div class="stat-item"><div class="stat-number" id="stat-learned">0</div><div class="stat-label">已学会</div></div>
+                <div class="stat-item"><div class="stat-number" id="stat-progress">0%</div><div class="stat-label">学习进度</div></div>
+                <div class="stat-item"><div class="stat-number" id="stat-quiz">0</div><div class="stat-label">测试次数</div></div>
+            </div>
+            <div class="progress-bar" style="height: 20px; margin-top: 20px;"><div class="progress-fill" id="stats-progress-fill" style="width: 0%"></div></div>
+            <p style="text-align: center; margin-top: 10px; color: #718096;">你已经完成了 <span id="stats-percent">0%</span> 的学习目标！</p>
+        </div>
+    </div>
+
+    <script>
 // 每日推送数据库
 const dailyContents = {
     "2026-02-10": {
@@ -15,23 +231,23 @@ const dailyContents = {
             { word: "break", phonetic: "/breɪk/", meaning: "v. 打破，折断" },
             { word: "leg", phonetic: "/leɡ/", meaning: "n. 腿" }
         ],
-        explanation: "这个短语的起源有几种说法，最流行的是剧院迷信：直接说'good luck'反而会带来厄运，所以说反话'break a leg'反而能祝对方好运。另一个说法是观众鼓掌太热烈，膝盖弯曲像要'break'了腿一样。"
+        explanation: "这个短语的起源有几种说法，最流行的是剧院迷信：直接说'good luck'反而会带来厄运，所以说反话'break a leg'反而能祝对方好运。"
     },
     "2026-02-11": {
         phrase: "I'm running late.",
         phonetic: "/aɪm ˈrʌnɪŋ leɪt/",
         translation: "我要迟到了 / 我快赶不上了",
         category: "日常用语",
-        scene: "非常实用的日常表达，用于告知他人自己可能会晚到。适用于上班、约会、会议、聚会等各种场合。比简单的'I'm late'更地道，表示'正在赶但可能要迟到'。",
+        scene: "非常实用的日常表达，用于告知他人自己可能会晚到。适用于上班、约会、会议、聚会等各种场合。",
         examples: [
             { en: "Sorry, I'm running late. Traffic is terrible today.", cn: "抱歉，我要迟到了。今天交通太糟糕了。" },
             { en: "Can we start the meeting in 10 minutes? I'm running late.", cn: "我们能10分钟后再开始会议吗？我要迟到了。" }
         ],
         keywords: [
-            { word: "running", phonetic: "/ˈrʌnɪŋ/", meaning: "adj. 在进行中的，连续的" },
-            { word: "late", phonetic: "/leɪt/", meaning: "adj. 迟的，晚的" }
+            { word: "running", phonetic: "/ˈrʌnɪŋ/", meaning: "adj. 在进行中的" },
+            { word: "late", phonetic: "/leɪt/", meaning: "adj. 迟的" }
         ],
-        explanation: "'Run late'是英语中非常地道的表达，字面意思是'时间在跑着流逝'，实际表示'要迟到了'。类似表达还有'running behind schedule'（落后于日程）。记住'running'在这里不是'跑步'的意思！"
+        explanation: "'Run late'是英语中非常地道的表达，表示'要迟到了'。类似表达还有'running behind schedule'。"
     },
     "2026-02-09": {
         phrase: "I couldn't agree more.",
@@ -47,7 +263,7 @@ const dailyContents = {
             { word: "agree", phonetic: "/əˈɡriː/", meaning: "v. 同意" },
             { word: "more", phonetic: "/mɔːr/", meaning: "adv. 更，更多" }
         ],
-        explanation: "这是一个双重否定表示强调的句式。字面意思是'我不能同意更多了'，实际意思是'我已经同意到极致了'，是非常地道的英语表达方式。"
+        explanation: "这是一个双重否定表示强调的句式。字面意思是'我不能同意更多了'，实际意思是'我已经同意到极致了'。"
     }
 };
 
@@ -161,23 +377,16 @@ function init() {
     updateStats();
 }
 
-// 获取今天的日期字符串 YYYY-MM-DD
 function getTodayString() {
     const today = new Date();
     return today.toISOString().split('T')[0];
 }
 
-// 格式化日期显示
 function formatDate(date) {
     const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekday = weekdays[date.getDay()];
-    return `${year}年${month}月${day}日 ${weekday}`;
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${weekdays[date.getDay()]}`;
 }
 
-// 加载今日内容
 function loadTodayContent() {
     const today = new Date();
     const dateStr = getTodayString();
@@ -188,19 +397,14 @@ function loadTodayContent() {
     if (content) {
         document.getElementById('today-content').innerHTML = generateTodayHTML(content);
     } else {
-        // 如果没有今日内容，显示示例或提示
         const exampleContent = dailyContents["2026-02-11"];
         document.getElementById('today-content').innerHTML = generateTodayHTML(exampleContent);
     }
 }
 
-// 生成今日内容HTML
 function generateTodayHTML(content) {
     let examplesHTML = content.examples.map(ex => 
-        `<div class="today-example">
-            <div class="today-example-en">${ex.en}</div>
-            <div class="today-example-cn">${ex.cn}</div>
-        </div>`
+        `<div class="today-example"><div class="today-example-en">${ex.en}</div><div class="today-example-cn">${ex.cn}</div></div>`
     ).join('');
     
     let keywordsHTML = content.keywords.map(kw => 
@@ -211,35 +415,17 @@ function generateTodayHTML(content) {
         <div class="today-phrase">${content.phrase}</div>
         <div class="today-phonetic">${content.phonetic}</div>
         <div class="today-translation">${content.translation}</div>
-        
-        <div class="today-section">
-            <div class="today-section-title">🎯 使用场景</div>
-            <div class="today-section-content">${content.scene}</div>
-        </div>
-        
-        <div class="today-section">
-            <div class="today-section-title">📝 例句</div>
-            <div class="today-section-content">${examplesHTML}</div>
-        </div>
-        
-        <div class="today-section">
-            <div class="today-section-title">🔤 重点词汇</div>
-            <div class="today-section-content">${keywordsHTML}</div>
-        </div>
-        
-        <div class="today-section">
-            <div class="today-section-title">💡 短语解读</div>
-            <div class="today-section-content">${content.explanation}</div>
-        </div>
+        <div class="today-section"><div class="today-section-title">🎯 使用场景</div><div class="today-section-content">${content.scene}</div></div>
+        <div class="today-section"><div class="today-section-title">📝 例句</div><div class="today-section-content">${examplesHTML}</div></div>
+        <div class="today-section"><div class="today-section-title">🔤 重点词汇</div><div class="today-section-content">${keywordsHTML}</div></div>
+        <div class="today-section"><div class="today-section-title">💡 短语解读</div><div class="today-section-content">${content.explanation}</div></div>
     `;
 }
 
-// 初始化日历
 function initCalendar() {
     renderCalendar();
 }
 
-// 渲染日历
 function renderCalendar() {
     const year = currentCalendarDate.getFullYear();
     const month = currentCalendarDate.getMonth();
@@ -257,13 +443,11 @@ function renderCalendar() {
     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
     let html = weekdays.map(w => `<div class="calendar-weekday">${w}</div>`).join('');
     
-    // 上月日期
     for (let i = firstDayWeek - 1; i >= 0; i--) {
         const day = daysInPrevMonth - i;
         html += `<div class="calendar-day other-month"><span class="calendar-day-number">${day}</span></div>`;
     }
     
-    // 当月日期
     const today = new Date();
     for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -274,13 +458,9 @@ function renderCalendar() {
         if (isToday) classes += ' today';
         if (hasContent) classes += ' has-content';
         
-        html += `<div class="${classes}" onclick="showHistory('${dateStr}')">
-            <span class="calendar-day-number">${day}</span>
-            ${hasContent ? '<span class="calendar-day-indicator"></span>' : ''}
-        </div>`;
+        html += `<div class="${classes}" onclick="showHistory('${dateStr}')"><span class="calendar-day-number">${day}</span>${hasContent ? '<span class="calendar-day-indicator"></span>' : ''}</div>`;
     }
     
-    // 下月日期
     const totalCells = Math.ceil((firstDayWeek + daysInMonth) / 7) * 7;
     const nextMonthDays = totalCells - (firstDayWeek + daysInMonth);
     for (let day = 1; day <= nextMonthDays; day++) {
@@ -290,24 +470,16 @@ function renderCalendar() {
     document.getElementById('calendar-grid').innerHTML = html;
 }
 
-// 切换月份
 function changeMonth(delta) {
     currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
     renderCalendar();
 }
 
-// 显示历史内容
 function showHistory(dateStr) {
     const content = dailyContents[dateStr];
     if (!content) {
-        const date = new Date(dateStr);
         document.getElementById('history-date').textContent = dateStr;
-        document.getElementById('history-body').innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📭</div>
-                <div>这一天没有学习内容</div>
-            </div>
-        `;
+        document.getElementById('history-body').innerHTML = `<div class="empty-state"><div style="font-size: 4rem; margin-bottom: 15px;">📭</div><div>这一天没有学习内容</div></div>`;
     } else {
         document.getElementById('history-date').textContent = dateStr;
         document.getElementById('history-body').innerHTML = generateTodayHTML(content);
@@ -315,16 +487,13 @@ function showHistory(dateStr) {
     document.getElementById('history-modal').classList.add('active');
 }
 
-// 关闭历史弹窗
 function closeHistory(event) {
     if (!event || event.target.id === 'history-modal' || event.target.className === 'history-close') {
         document.getElementById('history-modal').classList.remove('active');
     }
 }
 
-// 切换标签页
 function showSection(section) {
-    // 隐藏所有部分
     document.getElementById('today-section').classList.add('hidden');
     document.getElementById('calendar-section').classList.add('hidden');
     document.getElementById('learn-section').classList.add('hidden');
@@ -332,35 +501,25 @@ function showSection(section) {
     document.getElementById('list-section').classList.add('hidden');
     document.getElementById('stats-section').classList.add('hidden');
     
-    // 移除所有active类
     document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
     
-    // 显示选中的部分
     document.getElementById(section + '-section').classList.remove('hidden');
     
-    // 找到对应的tab并设为active
     const tabs = document.querySelectorAll('.nav-tab');
     const sectionNames = ['today', 'calendar', 'learn', 'quiz', 'list', 'stats'];
     const tabIndex = sectionNames.indexOf(section);
-    if (tabIndex >= 0) {
-        tabs[tabIndex].classList.add('active');
-    }
+    if (tabIndex >= 0) tabs[tabIndex].classList.add('active');
     
-    if (section === 'list') {
-        loadPhraseList();
-    } else if (section === 'stats') {
-        updateStats();
-    }
+    if (section === 'list') loadPhraseList();
+    else if (section === 'stats') updateStats();
 }
 
-// 加载类别
 function loadCategory() {
     currentCategory = document.getElementById('category-select').value;
     currentIndex = 0;
     displayPhrase();
 }
 
-// 显示当前短语
 function displayPhrase() {
     const category = phrases[currentCategory];
     const phrase = category[currentIndex];
@@ -369,11 +528,9 @@ function displayPhrase() {
     document.getElementById('current-translation').textContent = phrase.cn;
     document.getElementById('current-index').textContent = currentIndex + 1;
     document.getElementById('total-count').textContent = category.length;
-    document.getElementById('progress-fill').style.width = 
-        ((currentIndex + 1) / category.length * 100) + '%';
+    document.getElementById('progress-fill').style.width = ((currentIndex + 1) / category.length * 100) + '%';
 }
 
-// 朗读短语
 function speakPhrase() {
     const phrase = document.getElementById('current-phrase').textContent;
     const utterance = new SpeechSynthesisUtterance(phrase);
@@ -382,7 +539,6 @@ function speakPhrase() {
     speechSynthesis.speak(utterance);
 }
 
-// 朗读指定文本
 function speak(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US';
@@ -390,28 +546,21 @@ function speak(text) {
     speechSynthesis.speak(utterance);
 }
 
-// 标记已学会
 function markLearned() {
-    const phrase = phrases[currentCategory][currentIndex];
     const phraseId = currentCategory + '-' + currentIndex;
-    
     if (!learnedPhrases.includes(phraseId)) {
         learnedPhrases.push(phraseId);
         localStorage.setItem('learnedPhrases', JSON.stringify(learnedPhrases));
     }
-    
-    // 自动下一个
     nextPhrase();
 }
 
-// 下一个短语
 function nextPhrase() {
     const category = phrases[currentCategory];
     currentIndex = (currentIndex + 1) % category.length;
     displayPhrase();
 }
 
-// 加载短语列表
 function loadPhraseList() {
     const listCategory = document.getElementById('list-category-select').value;
     const container = document.getElementById('phrases-list');
@@ -441,7 +590,6 @@ function loadPhraseList() {
     });
 }
 
-// 切换学习状态
 function toggleLearned(phraseId, btn) {
     if (learnedPhrases.includes(phraseId)) {
         learnedPhrases = learnedPhrases.filter(id => id !== phraseId);
@@ -456,7 +604,6 @@ function toggleLearned(phraseId, btn) {
     loadPhraseList();
 }
 
-// 更新统计
 function updateStats() {
     let totalPhrases = 0;
     Object.values(phrases).forEach(cat => totalPhrases += cat.length);
@@ -471,26 +618,17 @@ function updateStats() {
     document.getElementById('stats-percent').textContent = progress + '%';
 }
 
-// 测试模式
 let currentQuiz = null;
 
 function startQuiz() {
-    // 获取所有短语
     let allPhrases = [];
     Object.keys(phrases).forEach(cat => {
-        phrases[cat].forEach((p, i) => {
-            allPhrases.push({...p, id: cat + '-' + i});
-        });
+        phrases[cat].forEach((p, i) => allPhrases.push({...p, id: cat + '-' + i}));
     });
     
-    // 随机选择10个
     allPhrases = allPhrases.sort(() => 0.5 - Math.random()).slice(0, 10);
     
-    currentQuiz = {
-        phrases: allPhrases,
-        current: 0,
-        correct: 0
-    };
+    currentQuiz = { phrases: allPhrases, current: 0, correct: 0 };
     
     document.getElementById('quiz-start-btn').classList.add('hidden');
     showQuizQuestion();
@@ -498,39 +636,23 @@ function startQuiz() {
 
 function showQuizQuestion() {
     if (currentQuiz.current >= currentQuiz.phrases.length) {
-        // 测试结束
         const accuracy = Math.round(currentQuiz.correct / currentQuiz.phrases.length * 100);
-        document.getElementById('quiz-question').innerHTML = `
-            <div style="font-size: 2rem; margin-bottom: 10px;">🎉</div>
-            测试完成！<br>
-            正确率：${currentQuiz.correct}/${currentQuiz.phrases.length} (${accuracy}%)
-        `;
+        document.getElementById('quiz-question').innerHTML = `<div style="font-size: 2rem; margin-bottom: 10px;">🎉</div>测试完成！<br>正确率：${currentQuiz.correct}/${currentQuiz.phrases.length} (${accuracy}%)`;
         document.getElementById('quiz-options').innerHTML = '';
         document.getElementById('quiz-start-btn').textContent = '再测一次';
         document.getElementById('quiz-start-btn').classList.remove('hidden');
         
-        // 更新统计
         quizStats.total++;
         localStorage.setItem('quizStats', JSON.stringify(quizStats));
         return;
     }
     
     const phrase = currentQuiz.phrases[currentQuiz.current];
-    document.getElementById('quiz-question').innerHTML = `
-        <div style="font-size: 0.9rem; color: #718096; margin-bottom: 10px;">
-            问题 ${currentQuiz.current + 1} / ${currentQuiz.phrases.length}
-        </div>
-        "${phrase.cn}"
-    `;
+    document.getElementById('quiz-question').innerHTML = `<div style="font-size: 0.9rem; color: #718096; margin-bottom: 10px;">问题 ${currentQuiz.current + 1} / ${currentQuiz.phrases.length}</div>"${phrase.cn}"`;
     
-    // 生成选项（正确答案 + 3个随机错误答案）
     const options = [phrase];
     let allOtherPhrases = [];
-    Object.keys(phrases).forEach(cat => {
-        phrases[cat].forEach(p => {
-            if (p.en !== phrase.en) allOtherPhrases.push(p);
-        });
-    });
+    Object.keys(phrases).forEach(cat => phrases[cat].forEach(p => { if (p.en !== phrase.en) allOtherPhrases.push(p); }));
     allOtherPhrases = allOtherPhrases.sort(() => 0.5 - Math.random()).slice(0, 3);
     options.push(...allOtherPhrases);
     options.sort(() => 0.5 - Math.random());
@@ -556,20 +678,12 @@ function checkAnswer(selected, correct, btn) {
         currentQuiz.correct++;
     } else {
         btn.classList.add('wrong');
-        options.forEach(opt => {
-            if (opt.textContent === correct.en) {
-                opt.classList.add('correct');
-            }
-        });
+        options.forEach(opt => { if (opt.textContent === correct.en) opt.classList.add('correct'); });
     }
     
-    setTimeout(() => {
-        currentQuiz.current++;
-        showQuizQuestion();
-    }, 1500);
+    setTimeout(() => { currentQuiz.current++; showQuizQuestion(); }, 1500);
 }
 
-// 初始化
 init();
     </script>
 </body>

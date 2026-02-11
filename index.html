@@ -92,6 +92,9 @@
         .icon-btn.speak { color: #667eea; }
         .icon-btn.check { color: #48bb78; }
         .icon-btn.checked { background: #48bb78; color: white; }
+        .audio-btn { background: #667eea; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 0.9rem; margin-left: 8px; vertical-align: middle; transition: all 0.3s; }
+        .audio-btn:hover { background: #5a67d8; transform: scale(1.1); }
+        .audio-btn.large { width: 40px; height: 40px; font-size: 1.1rem; }
         .section-title { font-size: 1.5rem; color: #2d3748; margin-bottom: 20px; }
         .empty-state { text-align: center; padding: 50px; color: #718096; }
         @media (max-width: 768px) { header h1 { font-size: 1.8rem; } .today-phrase { font-size: 1.5rem; } .calendar-grid { gap: 5px; } .phrase-english { font-size: 1.4rem; } }
@@ -403,16 +406,19 @@ function loadTodayContent() {
 }
 
 function generateTodayHTML(content) {
-    let examplesHTML = content.examples.map(ex => 
-        `<div class="today-example"><div class="today-example-en">${ex.en}</div><div class="today-example-cn">${ex.cn}</div></div>`
+    let examplesHTML = content.examples.map((ex, idx) => 
+        `<div class="today-example">
+            <div class="today-example-en">${ex.en} <button class="audio-btn" onclick="playText('${ex.en.replace(/'/g, "\\'")}')" title="播放">🔊</button></div>
+            <div class="today-example-cn">${ex.cn}</div>
+        </div>`
     ).join('');
     
     let keywordsHTML = content.keywords.map(kw => 
-        `<div style="margin: 5px 0;"><strong>${kw.word}</strong> <span style="color: #718096; font-family: monospace;">${kw.phonetic}</span> - ${kw.meaning}</div>`
+        `<div style="margin: 5px 0;"><strong>${kw.word}</strong> <button class="audio-btn" onclick="playText('${kw.word}')" title="播放">🔊</button> <span style="color: #718096; font-family: monospace;">${kw.phonetic}</span> - ${kw.meaning}</div>`
     ).join('');
     
     return `
-        <div class="today-phrase">${content.phrase}</div>
+        <div class="today-phrase">${content.phrase} <button class="audio-btn large" onclick="playText('${content.phrase.replace(/'/g, "\\'")}')" title="播放">🔊</button></div>
         <div class="today-phonetic">${content.phonetic}</div>
         <div class="today-translation">${content.translation}</div>
         <div class="today-section"><div class="today-section-title">🎯 使用场景</div><div class="today-section-content">${content.scene}</div></div>
@@ -544,6 +550,10 @@ function speak(text) {
     utterance.lang = 'en-US';
     utterance.rate = 0.8;
     speechSynthesis.speak(utterance);
+}
+
+function playText(text) {
+    speak(text);
 }
 
 function markLearned() {
